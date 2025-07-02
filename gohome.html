@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>業務生産性向上アンケート 要因分析インフォグラフィック</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+            margin: 0;
+            padding: 16px;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 350px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .bar-chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+        }
+        ul {
+            list-style-position: inside;
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+
+        @media print {
+            body {
+                background-color: #fff !important;
+                color: #000 !important;
+                padding: 0;
+                margin: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #print-container {
+                width: 100%;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box;
+            }
+            
+            /* ★★★★★【修正点①】CSSの定義を強化し、より確実に改ページを適用します ★★★★★ */
+            .page-break-before {
+                page-break-before: always !important;
+                break-before: page !important;
+                display: block; /* 改ページを適用する要素をブロックレベルとして扱う */
+            }
+
+            .print-section {
+                box-shadow: none !important;
+                border: 1px solid #ddd;
+                margin-bottom: 0 !important;
+                padding: 24px;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            h2, h3, h4, p, li {
+                color: #000 !important;
+            }
+
+            header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body style="font-family: 'Noto Sans JP', 'Inter', sans-serif; background-color: #f8fafc; color: #1f2937; padding: 16px;">
+
+    <div id="print-container" style="max-width: 1280px; margin-left: auto; margin-right: auto;">
+        <header style="text-align: center; margin-bottom: 48px;"></header>
+
+        <!-- ページ1: 全体概要 -->
+        <section class="print-section" style="margin-bottom: 64px; background-color: #ffffff; padding: 24px; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; text-align: center; color: #334155;">全事業部門に共通する5大課題</h2>
+            
+            <div style="display: block;">
+                 <div style="width: 100%; margin-bottom: 32px;">
+                    <div class="chart-container">
+                        <canvas id="overallIssuesChart"></canvas>
+                    </div>
+                </div>
+                <div style="width: 100%;">
+                    <div style="padding: 16px; background-color: #f1f5f9; border-radius: 0.5rem; margin-bottom: 16px;">
+                        <h3 style="font-weight: 700; font-size: 1.125rem; color: #1e293b;">1. 書類・記録業務の負担</h3>
+                        <p style="color: #475569;">計画書、報告書、サマリー等の作成・入力が最大の負担となり、残業の主因となっています。</p>
+                    </div>
+                    <div style="padding: 16px; background-color: #f1f5f9; border-radius: 0.5rem; margin-bottom: 16px;">
+                        <h3 style="font-weight: 700; font-size: 1.125rem; color: #1e293b;">2. ITインフラの問題</h3>
+                        <p style="color: #475569;">PCの不足・低スペック、システムの処理速度遅延、重複入力などが業務効率を著しく低下させています。</p>
+                    </div>
+                     <div style="padding: 16px; background-color: #f1f5f9; border-radius: 0.5rem; margin-bottom: 16px;">
+                        <h3 style="font-weight: 700; font-size: 1.125rem; color: #1e293b;">3. 人員不足と業務量の不均衡</h3>
+                        <p style="color: #475569;">絶対的な人員不足や業務の偏りが、一部職員への過重労働と疲弊を招いています。</p>
+                    </div>
+                    <div style="padding: 16px; background-color: #f1f5f9; border-radius: 0.5rem; margin-bottom: 16px;">
+                        <h3 style="font-weight: 700; font-size: 1.125rem; color: #1e293b;">4. 情報共有・コミュニケーション</h3>
+                        <p style="color: #475569;">部署間・職種間の連携不足や、非効率な情報伝達が手戻りや意思決定の遅延を引き起こしています。</p>
+                    </div>
+                     <div style="padding: 16px; background-color: #f1f5f9; border-radius: 0.5rem;">
+                        <h3 style="font-weight: 700; font-size: 1.125rem; color: #1e293b;">5. サービス残業の常態化</h3>
+                        <p style="color: #475569;">前残業や昼休み中の業務など、申請されない時間外労働が複数の部署で慣習化しています。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ページ2: 部門別分析タイトル + 病院セクション -->
+        <!-- ★★★★★【修正点②】この見出しの前で改ページするように変更します ★★★★★ -->
+        <h2 class="page-break-before" style="font-size: 1.875rem; font-weight: 700; margin-bottom: 32px; text-align: center; color: #334155;">部門別 主要課題分析</h2>
+        
+        <div style="width: 100%;">
+            <!-- Higashi-Naebo Hospital -->
+            <!-- ★★★★★【修正点③】病院セクションの改ページ指定は不要なので削除します ★★★★★ -->
+            <div class="print-section" style="background-color: #ffffff; padding: 24px; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                     <div style="padding: 12px; background-color: #dbeafe; border-radius: 9999px; margin-right: 16px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1e293b;">東苗穂病院</h3>
+                </div>
+                <p style="color: #475569; margin-bottom: 16px; font-weight: 600;">負担に感じている業務 (重み合計)</p>
+                <div class="bar-chart-container">
+                    <canvas id="hospitalChart"></canvas>
+                </div>
+                 <div style="margin-top: 24px;">
+                    <h4 style="font-weight: 700; margin-bottom: 8px; color: #334155;">特に要望の多い設備・システム改善案:</h4>
+                    <ul style="color: #475569;">
+                        <li>PC・タブレットの増設と高性能化</li>
+                        <li>Wi-Fi環境の抜本的強化</li>
+                        <li>電子カルテ・記録システムの統合と機能改善</li>
+                        <li>ナースコールシステムの改善</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ページ3: 在宅部門セクション -->
+            <!-- ★★★★★【修正点④】このセクションの前で改ページします（この行は変更なし） ★★★★★ -->
+            <div class="print-section page-break-before" style="background-color: #ffffff; padding: 24px; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                    <div style="padding: 12px; background-color: #dcfce7; border-radius: 9999px; margin-right: 16px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1e293b;">在宅部門</h3>
+                </div>
+                <p style="color: #475569; margin-bottom: 16px; font-weight: 600;">負担に感じている業務 (重み合計)</p>
+                <div class="bar-chart-container">
+                    <canvas id="homeCareChart"></canvas>
+                </div>
+                 <div style="margin-top: 24px;">
+                    <h4 style="font-weight: 700; margin-bottom: 8px; color: #334155;">特に要望の多い設備・システム改善案:</h4>
+                    <ul style="color: #475569;">
+                        <li>訪問先で使えるノートPC/高機能タブレット導入</li>
+                        <li>Hornetと電子カルテ等、複数システムの一本化</li>
+                        <li>グループLINEのような一斉連絡ツールの導入</li>
+                        <li>勤怠管理アプリやタイムカードの導入</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ページ4: 介護部門セクション -->
+            <!-- ★★★★★【修正点⑤】このセクションの前で改ページします（この行は変更なし） ★★★★★ -->
+            <div class="print-section page-break-before" style="background-color: #ffffff; padding: 24px; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);">
+                <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                    <div style="padding: 12px; background-color: #ede9fe; border-radius: 9999px; margin-right: 16px;">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1e293b;">介護部門</h3>
+                </div>
+                <p style="color: #475569; margin-bottom: 16px; font-weight: 600;">負担に感じている業務 (重み合計)</p>
+                <div class="bar-chart-container">
+                    <canvas id="careChart"></canvas>
+                </div>
+                 <div style="margin-top: 24px;">
+                    <h4 style="font-weight: 700; margin-bottom: 8px; color: #334155;">特に要望の多い設備・システム改善案:</h4>
+                    <ul style="color: #475569;">
+                        <li>PC増設と高性能化（ネット回線含む）</li>
+                        <li>記録・情報システムの一元化とペーパーレス化</li>
+                        <li>機械浴・リフトなど身体負担を軽減する介護機器</li>
+                        <li>見守りシステムの導入・連携強化</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript部分は変更ありません
+        document.addEventListener('DOMContentLoaded', () => {
+            Chart.defaults.font.family = "'Noto Sans JP', 'Inter', sans-serif";
+            Chart.defaults.font.weight = '400';
+            Chart.defaults.color = '#334155';
+            const overallCtx = document.getElementById('overallIssuesChart').getContext('2d');
+            new Chart(overallCtx, { type: 'doughnut', data: { labels: ['書類・記録業務', 'ITインフラ', '人員不足', '情報共有', 'サービス残業'], datasets: [{ label: '全社共通課題', data: [30, 25, 20, 15, 10], backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'], borderColor: '#ffffff', borderWidth: 4, hoverOffset: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 15, font: { size: 14 } } }, tooltip: { callbacks: { label: function(context) { let label = context.label || ''; if (label) { label += ': '; } if (context.parsed !== null) { label += context.parsed + '%'; } return label; } } } }, cutout: '40%' } });
+            const commonBarOptions = { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, grid: { color: '#e2e8f0' }, ticks: { font: { size: 12 } } }, y: { grid: { display: false }, ticks: { font: { size: 12 } } } }, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0f172a', titleFont: { size: 14 }, bodyFont: { size: 12 }, padding: 10, displayColors: false, callbacks: { label: function(context) { return `重み: ${context.raw}`; } } } } };
+            const hospitalCtx = document.getElementById('hospitalChart').getContext('2d');
+            new Chart(hospitalCtx, { type: 'bar', data: { labels: ['リハビリテーション部', '一般病棟', '回復期リハ病棟', '総合外来', '療養病棟'], datasets: [{ label: '負担業務の重み', data: [102, 91, 86, 60, 45], backgroundColor: '#3b82f6', borderRadius: 4, barThickness: 15 }] }, options: commonBarOptions });
+            const homeCareCtx = document.getElementById('homeCareChart').getContext('2d');
+            new Chart(homeCareCtx, { type: 'bar', data: { labels: ['東苗穂訪問看護ステーション', 'にじいろ歯科クリニック', '元町総合クリニック', '東雁来すこやかクリニック', '夕張市立診療所'], datasets: [{ label: '負担業務の重み', data: [30, 18, 8, 8, 7], backgroundColor: '#22c55e', borderRadius: 4, barThickness: 15 }] }, options: commonBarOptions });
+            const careCtx = document.getElementById('careChart').getContext('2d');
+            new Chart(careCtx, { type: 'bar', data: { labels: ['ひだまり', '老人保健施設ひまわり', 'すぎの子の家', 'きょうも元気', 'すぎの子'], datasets: [{ label: '負担業務の重み', data: [72, 69, 45, 41, 34], backgroundColor: '#8b5cf6', borderRadius: 4, barThickness: 15 }] }, options: commonBarOptions });
+        });
+    </script>
+</body>
+</html>
