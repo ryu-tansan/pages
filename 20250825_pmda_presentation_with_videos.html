@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医薬品情報管理における生成AI活用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+
+.slide.active {
+    display: flex;
+    opacity: 1;
+}
+
+
+        /* タイトルスライド */
+        .slide-title {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .slide-title h1 {
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInDown 1s ease;
+        }
+
+        .slide-title h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .slide-title .version {
+            font-size: 1.2em;
+            margin-top: 40px;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50px;
+            animation: fadeIn 1s ease 0.6s both;
+        }
+
+        /* 通常スライド */
+        h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 40px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #667eea;
+            width: 100%;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.8em;
+            color: #764ba2;
+            margin: 30px 0 20px;
+        }
+
+        .content {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .highlight-number {
+            font-size: 5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin: 30px 0;
+            animation: pulse 2s infinite;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h4 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .card p, .card li {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .process-flow {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 40px 0;
+        }
+
+        .process-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .process-step::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .process-step:last-child::after {
+            display: none;
+        }
+
+        .process-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .metrics-table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-size: 1.2em;
+        }
+
+        .metrics-table td {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 1.1em;
+        }
+
+        .metrics-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .highlight-text {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #68d391;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(118, 75, 162, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin: 0 5px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 15px 40px rgba(252, 182, 159, 0.3);
+        }
+
+        .conclusion-box h3 {
+            color: #d84315;
+            margin-bottom: 20px;
+        }
+    
+
+/* ======== 再調整後の追加CSS ======== */
+body {
+    font-family: 'メイリオ', Meiryo, sans-serif !important;
+    font-size: 1.4em !important;
+    letter-spacing: 0.05em !important;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.slide-title h1 {
+    font-size: 5em !important;
+}
+.slide-title h2 {
+    font-size: 3em !important;
+}
+.slide-title .version {
+    font-size: 1.8em !important;
+}
+
+h2 {
+    font-size: 3.6em !important;
+}
+h3 {
+    font-size: 2.6em !important;
+}
+.card h4 {
+    font-size: 1.9em !important;
+}
+
+body {
+    font-family: 'メイリオ', Meiryo, sans-serif !important;
+    font-size: 1.25em !important;
+    letter-spacing: 0.05em !important;
+}
+
+.slide-title h1 {
+    font-size: 4.5em !important;
+}
+.slide-title h2 {
+    font-size: 2.6em !important;
+}
+.slide-title .version {
+    font-size: 1.5em !important;
+}
+
+h2 {
+    font-size: 3.2em !important;
+}
+h3 {
+    font-size: 2.3em !important;
+}
+.card h4 {
+    font-size: 1.6em !important;
+}
+
+</style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- スライド1: タイトル -->
+        <div class="slide slide-title active">
+            <!-- <div class="timer">30秒</div> -->
+            <div class="slide-number">1 / 13</div>
+            <h1>生成AIによる業務効率化の実証実験</h1>
+            <h2>医薬品情報管理業務における<br>リモートMCPサーバの実用性検証</h2>
+            <div class="version">AWS Lambda MCP Server - 2025年9月</div>
+        </div>
+
+        <!-- スライド2: 現代の医薬品情報管理が抱える課題 -->
+        <div class="slide">
+            <!-- <div class="timer">1分30秒</div> -->
+            <div class="slide-number">2 / 13</div>
+            <div class="content">
+                <h2>現代の医薬品情報管理が抱える課題</h2>
+                <div class="highlight-number">17,000+</div>
+                <h3 style="text-align: center;">日本で承認されている医療用医薬品数</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>📚 情報フォーマットの非標準化</h4>
+                        <ul>
+                            <li>PMDA、製薬会社で異なる形式</li>
+                            <li>PDF、HTML、画像の混在</li>
+                            <li>統一規格の不在</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🔧 プログラム処理の困難性</h4>
+                        <ul>
+                            <li>非構造化データの壁</li>
+                            <li>文脈理解が必要</li>
+                            <li>自動化の障壁</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>💰 人的コストの増大</h4>
+                        <ul>
+                            <li>手動での情報収集</li>
+                            <li>整理・分析に時間</li>
+                            <li>患者対応時間の減少</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド3: 生成AIという新たな選択肢 -->
+        <div class="slide">
+            <!-- <div class="timer">1分</div> -->
+            <div class="slide-number">3 / 13</div>
+            <div class="content">
+                <h2>生成AIという新たな選択肢</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>🤖 自然言語理解（NLU）の活用</h4>
+                        <p>生成AIは人間と同じように文章を読み、理解し、整理できます。しかも機械的な処理速度で。</p>
+                    </div>
+                    <div class="card">
+                        <h4>🔌 MCP（Model Context Protocol）</h4>
+                        <p>2024年11月 Anthropic社発表<br>AIと外部システムの接続を標準化<br>開発期間をわずか2週間に短縮</p>
+                    </div>
+                </div>
+                <div class="conclusion-box">
+                    <h3>Claude Desktop × AWS Lambda</h3>
+                    <p>AIアシスタントから情報収集システムを直接呼び出し可能に</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド4: システム処理フロー -->
+        <div class="slide">
+            <!-- <div class="timer">1分</div> -->
+            <div class="slide-number">4 / 13</div>
+            <div class="content">
+                <h2>システム処理フロー</h2>
+                <div class="process-flow">
+                    <div class="process-step">
+                        <div class="process-icon">👩‍⚕️</div>
+                        <h4>薬剤師</h4>
+                        <p>「最新情報を教えて」</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon">🖥️</div>
+                        <h4>Claude Desktop</h4>
+                        <p>MCP Protocol</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon">⚡</div>
+                        <h4>Lambda Function</h4>
+                        <p>4カテゴリ並列収集</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon">🤖</div>
+                        <h4>AI構造化</h4>
+                        <p>優先度付け・分析</p>
+                    </div>
+                    <div class="process-step">
+                        <div class="process-icon">📊</div>
+                        <h4>整理済み情報</h4>
+                        <p>即座に表示</p>
+                    </div>
+                </div>
+                <div class="conclusion-box">
+                    <h3>⏱️ 処理時間: 約2分で完了</h3>
+                    <p class="highlight-text">従来30分 → 現在2分（93%削減）</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド5: 動画1（Google Drive埋め込み） -->
+        <div class="slide">
+            <div class="slide-number">5 / 13</div>
+            <div class="content" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                <iframe src="https://drive.google.com/file/d/1i8WybLdOcIqB3P2D6OXu_54_i-am-xVn/preview"
+                        allow="autoplay"
+                        style="width:80%; height:80%; border:0; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);"
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <!-- スライド6: 動画2（Google Drive埋め込み） -->
+        <div class="slide">
+            <div class="slide-number">6 / 13</div>
+            <div class="content" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                <iframe src="https://drive.google.com/file/d/1jUD8shoaqZ7peaMT4tW-dYUCAj0BMf6x/preview"
+                        allow="autoplay"
+                        style="width:80%; height:80%; border:0; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);"
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <!-- スライド7: Step 1 - 情報収集の指示 -->
+        <div class="slide">
+            <!-- <div class="timer">1分</div> -->
+            <div class="slide-number">7 / 13</div>
+            <div class="content">
+                <h2>Step 1 - 情報収集の指示</h2>
+                <div class="code-block">
+                    @Lambda_MCP pmdaIntegratedQuery {<br>
+                    &nbsp;&nbsp;"query": "緊急情報 改訂情報",<br>
+                    &nbsp;&nbsp;"timeRange": "24hours",<br>
+                    &nbsp;&nbsp;"categories": ["emergency", "revision"]<br>
+                    }
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h4>🔗 Lambda Function URL</h4>
+                        <p style="font-size: 0.9em; word-break: break-all;">https://hogehoge.lambda-url.ap-northeast-1.on.aws/</p>
+                    </div>
+                    <div class="card">
+                        <h4>💾 S3バケット</h4>
+                        <p>mcp-S3-Storage<br>履歴確認・監査ログ保存</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド8: Step 2 - AIによる分析・構造化 -->
+        <div class="slide">
+            <!-- <div class="timer">1分30秒</div> -->
+            <div class="slide-number">8 / 13</div>
+            <div class="content">
+                <h2>Step 2 - AIによる分析・構造化</h2>
+                <h3 style="text-align: center;">LLMが実行する5つの処理</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>1️⃣ 関連性スコアリング</h4>
+                        <p>検索キーワードとの関連度を0〜1で評価</p>
+                    </div>
+                    <div class="card">
+                        <h4>2️⃣ 優先度評価</h4>
+                        <p>HIGH / MEDIUM / LOW の3段階判定</p>
+                    </div>
+                    <div class="card">
+                        <h4>3️⃣ 重複除去</h4>
+                        <p>最も信頼性の高い情報源を選択</p>
+                    </div>
+                    <div class="card">
+                        <h4>4️⃣ 自動分類</h4>
+                        <p>薬剤名・副作用・相互作用を抽出</p>
+                    </div>
+                    <div class="card">
+                        <h4>5️⃣ 医学的重要度判定</h4>
+                        <p>院内採用薬・患者影響を考慮</p>
+                    </div>
+                </div>
+                <div class="conclusion-box">
+                    <p>非構造化テキスト → JSON構造化データへ変換</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド9: Step 3 - 構造化データに基づいた回答 -->
+        <div class="slide">
+            <!-- <div class="timer">1分</div> -->
+            <div class="slide-number">9 / 13</div>
+            <div class="content">
+                <h2>Step 3 - 構造化データに基づいた回答</h2>
+                <div class="card" style="max-width: 800px; margin: 0 auto;">
+                    <h4>📋 整理されたレポート例</h4>
+                    <ul>
+                        <li><span class="emoji">🔴</span> 緊急情報: 0件</li>
+                        <li><span class="emoji">⚠️</span> 改訂情報: 2件（要確認）</li>
+                        <li><span class="emoji">💊</span> 対象薬剤: ワルファリン、インスリン製剤</li>
+                        <li><span class="emoji">📝</span> 推奨対応: 院内周知、処方時注意喚起</li>
+                    </ul>
+                </div>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>処理内容</th>
+                            <th>従来</th>
+                            <th>MCP導入後</th>
+                            <th>削減率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>情報収集</td>
+                            <td>30分</td>
+                            <td>2分</td>
+                            <td class="highlight-text">93%削減</td>
+                        </tr>
+                        <tr>
+                            <td>レポート作成</td>
+                            <td>60分</td>
+                            <td>自動生成</td>
+                            <td class="highlight-text">100%削減</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- スライド10: 自動化への展望 -->
+        <div class="slide">
+            <!-- <div class="timer">1分</div> -->
+            <div class="slide-number">10 / 13</div>
+            <div class="content">
+                <h2>自動化</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>⚙️ AWS EventBridge設定</h4>
+                        <div class="code-block" style="font-size: 0.9em;">
+                            {<br>
+                            &nbsp;&nbsp;"cycle": "daily",<br>
+                            &nbsp;&nbsp;"time": "09:00",<br>
+                            &nbsp;&nbsp;"categories": ["all"],<br>
+                            &nbsp;&nbsp;"autoSave": true<br>
+                            }
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>🎯 期待される効果</h4>
+                        <ul>
+                            <li>全医薬品情報を自動収集</li>
+                            <li>構造化データの蓄積</li>
+                            <li>AIによる傾向分析</li>
+                            <li>予測的アラート生成</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="conclusion-box">
+                    <h3>発出される全医薬品情報を自動で構造化・蓄積可能に</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド11: 実用化に向けた3つの課題 -->
+        <div class="slide">
+            <!-- <div class="timer">1分30秒</div> -->
+            <div class="slide-number">11 / 13</div>
+            <div class="content">
+                <h2>実用化に向けた3つの課題</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h4>1️⃣ 汎用性</h4>
+                        <p><strong>現状:</strong> 個人利用想定のPoC仕様</p>
+                        <p><strong>対策:</strong></p>
+                        <ul>
+                            <li>ロールベースアクセス制御</li>
+                            <li>API標準化</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>2️⃣ セキュリティ</h4>
+                        <p><strong>現状:</strong> APIキー認証のみ</p>
+                        <p><strong>対策:</strong></p>
+                        <ul>
+                            <li>OAuth 2.0導入</li>
+                            <li>監査ログの強化</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>3️⃣ コスト</h4>
+                        <p><strong>現状:</strong> AWS Lambda従量課金</p>
+                        <p><strong>対策:</strong></p>
+                        <ul>
+                            <li>Reserved Capacity購入</li>
+                            <li>キャッシュ戦略の最適化</li>
+                            <li>処理の効率化</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="conclusion-box">
+                    <p>いずれも技術的に解決可能 - <strong>システムが実際に動作することが実証された</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド12: 結論と今後の展望 -->
+        <div class="slide">
+            <!-- <div class="timer">1分30秒</div> -->
+            <div class="slide-number">12 / 13</div>
+            <div class="content">
+                <h2>結論と今後の展望</h2>
+                <div class="conclusion-box" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <h3 style="color: white;">「何はともあれ、動作することは分かった」</h3>
+                    <p style="color: white;">生成AIを用いた業務効率化が可能であることが実証された</p>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h4>📊 実証された成果</h4>
+                        <ul>
+                            <li>93%の時間削減</li>
+                            <li>患者対応時間の増加</li>
+                            <li>医療の質向上への貢献</li>
+                        </ul>
+                    </div>
+                    <!-- <div class="card">
+                        <h4>🗓️ ロードマップ</h4>
+                        <ul>
+                            <li>2025 Q3: セキュリティ強化</li>
+                            <li>2025 Q4: マルチユーザー対応</li>
+                            <li>2026 Q1: 全院展開</li>
+                        </ul>
+                    </div> -->
+                    <div class="card">
+                        <h4>🔄 応用可能性</h4>
+                        <ul>
+                            <li>診療ガイドライン更新</li>
+                            <li>学会発表の要約</li>
+                            <li>論文の翻訳・整理</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スライド13: クロージング -->
+        <div class="slide">
+            <!-- <div class="timer">30秒</div> -->
+            <div class="slide-number">13 / 13</div>
+            <div class="content" style="text-align: center;">
+                <h2>ご清聴ありがとうございました</h2>
+                <!-- <div class="conclusion-box" style="margin: 50px auto; max-width: 800px;">
+                    <h3>医薬品情報管理の未来を、共に創っていきましょう</h3> -->
+                    <p style="font-size: 1.2em; margin: 30px 0;">
+                        リモートMCPサーバの実用性検証
+                    </p>
+                </div>
+                <!-- <div class="card" style="max-width: 600px; margin: 40px auto;">
+                    <h4>📞 お問い合わせ</h4>
+                    <p>📧 pmda-mcp@healthcare.jp</p>
+                    <p>🌐 https://lambda-mcp.healthcare.jp</p>
+                    <p>📱 デモンストレーション随時受付中</p>
+                </div> -->
+                <p style="margin-top: 40px; font-size: 1.1em;">
+                    IT × 働き方改革 = より良い医療提供体制の構築
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <!-- <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">◀ 前へ</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">次へ ▶</button>
+    </div> -->
+
+    
+<script>
+let currentSlide = 0;
+function getSlides() { return document.querySelectorAll('.slide'); }
+function totalSlidesCount() { return getSlides().length; }
+
+function updateSlideNumbers() {
+  const slides = getSlides();
+  slides.forEach((slide, idx) => {
+    let sn = slide.querySelector('.slide-number');
+    if (!sn) {
+      sn = document.createElement('div');
+      sn.className = 'slide-number';
+      slide.appendChild(sn);
+    }
+    sn.textContent = `${idx + 1} / ${slides.length}`;
+  });
+}
+
+function showSlide(n) {
+  const slides = getSlides();
+  slides.forEach((slide, index) => {
+    slide.classList.toggle('active', index === n);
+  });
+  updateSlideNumbers();
+}
+
+function changeSlide(direction) {
+  const slides = getSlides();
+  currentSlide += direction;
+  if (currentSlide < 0) currentSlide = 0;
+  if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+  showSlide(currentSlide);
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') changeSlide(-1);
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    changeSlide(1);
+  }
+});
+
+// Click navigation: right half -> next, left half -> prev
+document.addEventListener('click', (e) => {
+  // Ignore clicks on links or inside iframes controls bubble? If target is within an interactive element, ignore.
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (['a', 'button', 'input', 'textarea', 'select', 'label'].includes(tag)) return;
+  const x = e.clientX;
+  const width = window.innerWidth || document.documentElement.clientWidth;
+  if (x > width / 2) {
+    changeSlide(1);
+  } else {
+    changeSlide(-1);
+  }
+});
+
+// Touch / swipe
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+}, {passive:true});
+
+document.addEventListener('touchend', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  if (touchEndX < touchStartX - 50) changeSlide(1);
+  if (touchEndX > touchStartX + 50) changeSlide(-1);
+}, {passive:true});
+
+// Init
+updateSlideNumbers();
+showSlide(0);
+</script>
+
+</body>
+</html>
