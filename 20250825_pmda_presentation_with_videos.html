@@ -432,7 +432,7 @@ h3 {
                         <ul>
                             <li>PMDA、製薬会社で異なる形式</li>
                             <li>PDF、HTML、画像の混在</li>
-                            <li>統一規格の不在</li>
+                            <li>統一規格なし</li>
                         </ul>
                     </div>
                     <div class="card">
@@ -464,11 +464,11 @@ h3 {
                 <div class="grid">
                     <div class="card">
                         <h4>🤖 自然言語理解（NLU）の活用</h4>
-                        <p>生成AIは人間と同じように文章を読み、理解し、整理できる。<br>しかも高速で。</p>
+                        <p>生成AIは人間と同じように文章を読み、理解し、整理できる。<br>しかも高速。</p>
                     </div>
                     <div class="card">
                         <h4>🔌 MCP（Model Context Protocol）</h4>
-                        <p>2024年11月 Anthropic社発表<br>AIと外部システムの接続を標準化<br>開発期間わずか 2 ヵ月</p>
+                        <p>2024年11月 Anthropic社発表<br>AIと外部システムの接続を標準化<br>開発期間 2 ヵ月</p>
                     </div>
                 </div>
                 <div class="conclusion-box">
@@ -551,7 +551,7 @@ h3 {
                 <div class="code-block">
                     @Lambda_MCP pmdaIntegratedQuery {<br>
                     &nbsp;&nbsp;"query": "緊急情報 改訂情報",<br>
-                    &nbsp;&nbsp;"timeRange": "24hours",<br>
+                    &nbsp;&nbsp;"timeRange": "30days",<br>
                     &nbsp;&nbsp;"categories": ["emergency", "revision"]<br>
                     }
                 </div>
@@ -586,16 +586,16 @@ h3 {
                     </div>
                     <div class="card">
                         <h4>3️⃣ 重複除去</h4>
-                        <p>最も信頼性の高い情報源を選択</p>
+                        <p>指定したurlの重要項目を優先的に採用</p>
                     </div>
                     <div class="card">
                         <h4>4️⃣ 自動分類</h4>
                         <p>薬剤名・副作用・相互作用を抽出</p>
                     </div>
-                    <div class="card">
+<!--                     <div class="card">
                         <h4>5️⃣ 医学的重要度判定</h4>
                         <p>院内採用薬・患者影響を考慮</p>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="conclusion-box">
                     <p>非構造化テキスト → JSON構造化データへ変換</p>
@@ -613,8 +613,8 @@ h3 {
                     <h4>📋 整理されたレポート例</h4>
                     <ul>
                         <li><span class="emoji">🔴</span> 緊急情報: 0件</li>
-                        <li><span class="emoji">⚠️</span> 改訂情報: 2件（要確認）</li>
-                        <li><span class="emoji">💊</span> 対象薬剤: ワルファリン、インスリン製剤</li>
+                        <li><span class="emoji">⚠️</span> 改訂情報: 6件（要確認）</li>
+                        <li><span class="emoji">💊</span> 対象薬剤: 抗悪性腫瘍剤、GLP-1受容体作動薬</li>
                         <li><span class="emoji">📝</span> 推奨対応: 院内周知、処方時注意喚起</li>
                     </ul>
                 </div>
@@ -716,7 +716,7 @@ h3 {
                     </div>
                 </div>
                 <div class="conclusion-box">
-                    <p>解決できそうなことも多い - <strong>システムが実際に動作することが実証された</strong></p>
+                    <p>解決できそうなことも多い - <strong>システムが実際に動作することを実証</strong></p>
                 </div>
             </div>
         </div>
